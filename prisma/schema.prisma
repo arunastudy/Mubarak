@@ -1,0 +1,594 @@
+// Prisma schema for "Mubarak Digital Ecosystem"
+// Generated from "Схема БД - Mubarak.md" + "ТЗ Mubarak.md"
+// Database: PostgreSQL (uses UUID, JSONB, BIGSERIAL, TIMESTAMPTZ)
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+/// Языки интерфейса и контента: кыргызский / русский / английский
+enum Language {
+  ky
+  ru
+  en
+}
+
+enum UserStatus {
+  active
+  blocked
+}
+
+enum BranchStatus {
+  active
+  inactive
+}
+
+enum ZoneStatus {
+  active
+  inactive
+}
+
+enum TableStatus {
+  available
+  occupied
+  inactive
+}
+
+enum CartStatus {
+  active
+  converted
+  abandoned
+}
+
+enum OrderType {
+  dine_in
+  delivery
+  pickup
+}
+
+/// Статусы заказа (Kitchen Display + доставка)
+enum OrderStatus {
+  pending
+  confirmed
+  preparing
+  ready
+  on_delivery
+  delivered
+  completed
+  cancelled
+}
+
+enum PaymentMethod {
+  qr
+  mbank
+  elcart
+  visa
+  mastercard
+  cash
+}
+
+enum PaymentStatus {
+  pending
+  paid
+  failed
+  refunded
+}
+
+enum ReservationStatus {
+  pending
+  confirmed
+  cancelled
+  completed
+  no_show
+}
+
+enum NotificationChannel {
+  push
+  sms
+  email
+  telegram
+}
+
+enum NotificationStatus {
+  pending
+  sent
+  failed
+  read
+}
+
+// ---------------------------------------------------------------------------
+// 1. users — Пользователи (клиенты и сотрудники)
+// ---------------------------------------------------------------------------
+
+model User {
+  id                String     @id @default(uuid()) @db.Uuid
+  phone             String     @unique @db.VarChar(20)
+  email             String?    @unique @db.VarChar(255)
+  passwordHash      String     @map("password_hash") @db.VarChar(255)
+  firstName         String?    @map("first_name") @db.VarChar(100)
+  lastName          String?    @map("last_name") @db.VarChar(100)
+  avatarUrl         String?    @map("avatar_url") @db.Text
+  preferredLanguage Language   @default(ru) @map("preferred_language")
+  status            UserStatus @default(active)
+  phoneVerified     Boolean    @default(false) @map("phone_verified")
+  emailVerified     Boolean    @default(false) @map("email_verified")
+  lastLoginAt       DateTime?  @map("last_login_at") @db.Timestamptz(6)
+  createdAt         DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime   @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  roles             UserRole[]
+  deliveryAddresses DeliveryAddress[]
+  carts             ShoppingCart[]
+  orders            Order[]
+  reservations      Reservation[]
+  customerProfile   CustomerProfile?
+  notifications     Notification[]
+  auditLogs         AuditLog[]
+
+  @@index([status])
+  @@map("users")
+}
+
+// ---------------------------------------------------------------------------
+// 2. roles — Роли
+// ---------------------------------------------------------------------------
+
+model Role {
+  id          String  @id @default(uuid()) @db.Uuid
+  name        String  @db.VarChar(50)
+  code        String  @unique @db.VarChar(50)
+  description String? @db.Text
+
+  users UserRole[]
+
+  @@map("roles")
+}
+
+// ---------------------------------------------------------------------------
+// 3. user_roles — Роли пользователей
+// ---------------------------------------------------------------------------
+
+model UserRole {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  roleId    String   @map("role_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, roleId])
+  @@index([roleId])
+  @@map("user_roles")
+}
+
+// ---------------------------------------------------------------------------
+// 4. branches — Филиалы
+// ---------------------------------------------------------------------------
+
+model Branch {
+  id          String       @id @default(uuid()) @db.Uuid
+  name        String       @db.VarChar(255)
+  code        String       @unique @db.VarChar(50)
+  address     String?      @db.Text
+  city        String?      @db.VarChar(100)
+  phone       String?      @db.VarChar(20)
+  latitude    Decimal?     @db.Decimal(10, 7)
+  longitude   Decimal?     @db.Decimal(10, 7)
+  openingTime DateTime?    @map("opening_time") @db.Time(6)
+  closingTime DateTime?    @map("closing_time") @db.Time(6)
+  status      BranchStatus @default(active)
+  createdAt   DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  zones        RestaurantZone[]
+  tables       RestaurantTable[]
+  carts        ShoppingCart[]
+  orders       Order[]
+  reservations Reservation[]
+
+  @@map("branches")
+}
+
+// ---------------------------------------------------------------------------
+// 5. restaurant_zones — Зоны ресторана (зал, терраса, VIP)
+// ---------------------------------------------------------------------------
+
+model RestaurantZone {
+  id          String     @id @default(uuid()) @db.Uuid
+  branchId    String     @map("branch_id") @db.Uuid
+  name        String     @db.VarChar(100)
+  description String?    @db.Text
+  capacity    Int?
+  status      ZoneStatus @default(active)
+
+  branch       Branch            @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  tables       RestaurantTable[]
+  reservations Reservation[]
+
+  @@index([branchId])
+  @@map("restaurant_zones")
+}
+
+// ---------------------------------------------------------------------------
+// 6. restaurant_tables — Столы (бронирование + QR-заказ)
+// ---------------------------------------------------------------------------
+
+model RestaurantTable {
+  id          String      @id @default(uuid()) @db.Uuid
+  branchId    String      @map("branch_id") @db.Uuid
+  zoneId      String?     @map("zone_id") @db.Uuid
+  tableNumber String      @map("table_number") @db.VarChar(20)
+  seatsCount  Int         @default(0) @map("seats_count")
+  status      TableStatus @default(available)
+  qrToken     String      @unique @map("qr_token") @db.VarChar(255)
+  createdAt   DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  branch       Branch          @relation(fields: [branchId], references: [id], onDelete: Cascade)
+  zone         RestaurantZone? @relation(fields: [zoneId], references: [id], onDelete: SetNull)
+  orders       Order[]
+  reservations Reservation[]
+
+  @@index([branchId])
+  @@index([zoneId])
+  @@map("restaurant_tables")
+}
+
+// ---------------------------------------------------------------------------
+// 7. menu_categories — Категории меню (иерархические)
+// ---------------------------------------------------------------------------
+
+model MenuCategory {
+  id          String  @id @default(uuid()) @db.Uuid
+  parentId    String? @map("parent_id") @db.Uuid
+  name        String  @db.VarChar(255)
+  slug        String  @unique @db.VarChar(255)
+  description String? @db.Text
+  sortOrder   Int     @default(0) @map("sort_order")
+  isActive    Boolean @default(true) @map("is_active")
+
+  parent   MenuCategory?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children MenuCategory[] @relation("CategoryTree")
+  dishes   Dish[]
+
+  @@index([parentId])
+  @@map("menu_categories")
+}
+
+// ---------------------------------------------------------------------------
+// 8. dishes — Блюда
+// ---------------------------------------------------------------------------
+
+model Dish {
+  id                 String   @id @default(uuid()) @db.Uuid
+  categoryId         String   @map("category_id") @db.Uuid
+  name               String   @db.VarChar(255)
+  description        String?  @db.Text
+  composition        String?  @db.Text
+  imageUrl           String?  @map("image_url") @db.Text
+  price              Decimal  @db.Decimal(12, 2)
+  weightGrams        Int?     @map("weight_grams")
+  calories           Decimal? @db.Decimal(8, 2)
+  protein            Decimal? @db.Decimal(8, 2)
+  fat                Decimal? @db.Decimal(8, 2)
+  carbohydrates      Decimal? @db.Decimal(8, 2)
+  cookingTimeMinutes Int?     @map("cooking_time_minutes")
+  spicyLevel         Int?     @map("spicy_level") @db.SmallInt
+  isAvailable        Boolean  @default(true) @map("is_available")
+  isActive           Boolean  @default(true) @map("is_active")
+  createdAt          DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt          DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  category         MenuCategory      @relation(fields: [categoryId], references: [id])
+  translations     DishTranslation[]
+  cartItems        CartItem[]
+  orderItems       OrderItem[]
+  reservationItems ReservationItem[]
+
+  @@index([categoryId])
+  @@index([isActive, isAvailable])
+  @@map("dishes")
+}
+
+// ---------------------------------------------------------------------------
+// 9. dish_translations — Переводы блюд (ky / ru / en)
+// ---------------------------------------------------------------------------
+
+model DishTranslation {
+  id           String   @id @default(uuid()) @db.Uuid
+  dishId       String   @map("dish_id") @db.Uuid
+  languageCode Language @map("language_code")
+  name         String   @db.VarChar(255)
+  description  String?  @db.Text
+  composition  String?  @db.Text
+
+  dish Dish @relation(fields: [dishId], references: [id], onDelete: Cascade)
+
+  @@unique([dishId, languageCode])
+  @@map("dish_translations")
+}
+
+// ---------------------------------------------------------------------------
+// 10. delivery_addresses — Адреса доставки
+// ---------------------------------------------------------------------------
+
+model DeliveryAddress {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  label     String?  @db.VarChar(100)
+  address   String   @db.Text
+  city      String?  @db.VarChar(100)
+  latitude  Decimal? @db.Decimal(10, 7)
+  longitude Decimal? @db.Decimal(10, 7)
+  entrance  String?  @db.VarChar(20)
+  floor     String?  @db.VarChar(20)
+  apartment String?  @db.VarChar(20)
+  comment   String?  @db.Text
+  isDefault Boolean  @default(false) @map("is_default")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orders Order[]
+
+  @@index([userId])
+  @@map("delivery_addresses")
+}
+
+// ---------------------------------------------------------------------------
+// 11. shopping_carts — Корзины
+// ---------------------------------------------------------------------------
+
+model ShoppingCart {
+  id        String     @id @default(uuid()) @db.Uuid
+  userId    String     @map("user_id") @db.Uuid
+  branchId  String?    @map("branch_id") @db.Uuid
+  status    CartStatus @default(active)
+  createdAt DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime   @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  branch Branch?    @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  items  CartItem[]
+
+  @@index([userId])
+  @@index([branchId])
+  @@map("shopping_carts")
+}
+
+// ---------------------------------------------------------------------------
+// 12. cart_items — Товары корзины
+// ---------------------------------------------------------------------------
+
+model CartItem {
+  id        String   @id @default(uuid()) @db.Uuid
+  cartId    String   @map("cart_id") @db.Uuid
+  dishId    String   @map("dish_id") @db.Uuid
+  quantity  Int      @default(1)
+  unitPrice Decimal  @map("unit_price") @db.Decimal(12, 2)
+  comment   String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  cart ShoppingCart @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  dish Dish         @relation(fields: [dishId], references: [id])
+
+  @@index([cartId])
+  @@index([dishId])
+  @@map("cart_items")
+}
+
+// ---------------------------------------------------------------------------
+// 13. orders — Заказы
+// ---------------------------------------------------------------------------
+
+model Order {
+  id             String      @id @default(uuid()) @db.Uuid
+  orderNumber    String      @unique @map("order_number") @db.VarChar(50)
+  userId         String      @map("user_id") @db.Uuid
+  branchId       String      @map("branch_id") @db.Uuid
+  tableId        String?     @map("table_id") @db.Uuid
+  addressId      String?     @map("address_id") @db.Uuid
+  orderType      OrderType   @map("order_type")
+  status         OrderStatus @default(pending)
+  scheduledAt    DateTime?   @map("scheduled_at") @db.Timestamptz(6)
+  subtotal       Decimal     @default(0) @db.Decimal(12, 2)
+  discountAmount Decimal     @default(0) @map("discount_amount") @db.Decimal(12, 2)
+  deliveryFee    Decimal     @default(0) @map("delivery_fee") @db.Decimal(12, 2)
+  totalAmount    Decimal     @default(0) @map("total_amount") @db.Decimal(12, 2)
+  comment        String?     @db.Text
+  createdAt      DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt      DateTime    @updatedAt @map("updated_at") @db.Timestamptz(6)
+  completedAt    DateTime?   @map("completed_at") @db.Timestamptz(6)
+
+  user    User             @relation(fields: [userId], references: [id])
+  branch  Branch           @relation(fields: [branchId], references: [id])
+  table   RestaurantTable? @relation(fields: [tableId], references: [id], onDelete: SetNull)
+  address DeliveryAddress? @relation(fields: [addressId], references: [id], onDelete: SetNull)
+  items   OrderItem[]
+  payments Payment[]
+
+  @@index([userId])
+  @@index([branchId])
+  @@index([status])
+  @@index([orderType])
+  @@map("orders")
+}
+
+// ---------------------------------------------------------------------------
+// 14. order_items — Позиции заказа
+// ---------------------------------------------------------------------------
+
+model OrderItem {
+  id             String   @id @default(uuid()) @db.Uuid
+  orderId        String   @map("order_id") @db.Uuid
+  dishId         String   @map("dish_id") @db.Uuid
+  dishName       String   @map("dish_name") @db.VarChar(255)
+  quantity       Int      @default(1)
+  unitPrice      Decimal  @map("unit_price") @db.Decimal(12, 2)
+  discountAmount Decimal  @default(0) @map("discount_amount") @db.Decimal(12, 2)
+  totalPrice     Decimal  @map("total_price") @db.Decimal(12, 2)
+  comment        String?  @db.Text
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  dish  Dish  @relation(fields: [dishId], references: [id])
+
+  @@index([orderId])
+  @@index([dishId])
+  @@map("order_items")
+}
+
+// ---------------------------------------------------------------------------
+// 15. payments — Платежи (заказы и депозиты бронирований)
+// ---------------------------------------------------------------------------
+
+model Payment {
+  id            String        @id @default(uuid()) @db.Uuid
+  orderId       String?       @map("order_id") @db.Uuid
+  amount        Decimal       @db.Decimal(12, 2)
+  method        PaymentMethod
+  status        PaymentStatus @default(pending)
+  transactionId String?       @map("transaction_id") @db.VarChar(255)
+  provider      String?       @db.VarChar(100)
+  paidAt        DateTime?     @map("paid_at") @db.Timestamptz(6)
+  createdAt     DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  order              Order?       @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  reservationDeposit Reservation? @relation("ReservationDeposit")
+
+  @@index([orderId])
+  @@index([status])
+  @@map("payments")
+}
+
+// ---------------------------------------------------------------------------
+// 16. reservations — Бронирования
+// ---------------------------------------------------------------------------
+
+model Reservation {
+  id                String            @id @default(uuid()) @db.Uuid
+  reservationNumber String            @unique @map("reservation_number") @db.VarChar(50)
+  userId            String            @map("user_id") @db.Uuid
+  branchId          String            @map("branch_id") @db.Uuid
+  zoneId            String?           @map("zone_id") @db.Uuid
+  tableId           String?           @map("table_id") @db.Uuid
+  reservationDate   DateTime          @map("reservation_date") @db.Date
+  startTime         DateTime          @map("start_time") @db.Time(6)
+  endTime           DateTime          @map("end_time") @db.Time(6)
+  guestsCount       Int               @map("guests_count")
+  status            ReservationStatus @default(pending)
+  depositAmount     Decimal           @default(0) @map("deposit_amount") @db.Decimal(12, 2)
+  depositPaymentId  String?           @unique @map("deposit_payment_id") @db.Uuid
+  comment           String?           @db.Text
+  createdAt         DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime          @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user           User              @relation(fields: [userId], references: [id])
+  branch         Branch            @relation(fields: [branchId], references: [id])
+  zone           RestaurantZone?   @relation(fields: [zoneId], references: [id], onDelete: SetNull)
+  table          RestaurantTable?  @relation(fields: [tableId], references: [id], onDelete: SetNull)
+  depositPayment Payment?          @relation("ReservationDeposit", fields: [depositPaymentId], references: [id], onDelete: SetNull)
+  items          ReservationItem[]
+
+  @@index([userId])
+  @@index([branchId])
+  @@index([reservationDate])
+  @@index([status])
+  @@map("reservations")
+}
+
+// ---------------------------------------------------------------------------
+// 17. reservation_items — Предзаказ блюд при бронировании
+// ---------------------------------------------------------------------------
+
+model ReservationItem {
+  id            String  @id @default(uuid()) @db.Uuid
+  reservationId String  @map("reservation_id") @db.Uuid
+  dishId        String  @map("dish_id") @db.Uuid
+  quantity      Int     @default(1)
+  unitPrice     Decimal @map("unit_price") @db.Decimal(12, 2)
+  comment       String? @db.Text
+
+  reservation Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
+  dish        Dish        @relation(fields: [dishId], references: [id])
+
+  @@index([reservationId])
+  @@index([dishId])
+  @@map("reservation_items")
+}
+
+// ---------------------------------------------------------------------------
+// 18. customer_profiles — Профиль клиента / CRM
+// ---------------------------------------------------------------------------
+
+model CustomerProfile {
+  id                String    @id @default(uuid()) @db.Uuid
+  userId            String    @unique @map("user_id") @db.Uuid
+  birthday          DateTime? @db.Date
+  totalOrders       Int       @default(0) @map("total_orders")
+  totalSpent        Decimal   @default(0) @map("total_spent") @db.Decimal(14, 2)
+  averageCheck      Decimal   @default(0) @map("average_check") @db.Decimal(12, 2)
+  firstOrderAt      DateTime? @map("first_order_at") @db.Timestamptz(6)
+  lastOrderAt       DateTime? @map("last_order_at") @db.Timestamptz(6)
+  marketingConsent  Boolean   @default(false) @map("marketing_consent")
+  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("customer_profiles")
+}
+
+// ---------------------------------------------------------------------------
+// 19. notifications — Уведомления (push / sms / email / telegram)
+// ---------------------------------------------------------------------------
+
+model Notification {
+  id                String              @id @default(uuid()) @db.Uuid
+  userId            String              @map("user_id") @db.Uuid
+  type              String              @db.VarChar(50)
+  channel           NotificationChannel
+  title             String?             @db.VarChar(255)
+  message           String              @db.Text
+  status            NotificationStatus  @default(pending)
+  relatedEntityType String?             @map("related_entity_type") @db.VarChar(50)
+  relatedEntityId   String?             @map("related_entity_id") @db.Uuid
+  sentAt            DateTime?           @map("sent_at") @db.Timestamptz(6)
+  readAt            DateTime?           @map("read_at") @db.Timestamptz(6)
+  createdAt         DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@map("notifications")
+}
+
+// ---------------------------------------------------------------------------
+// 20. audit_logs — Журнал действий
+// ---------------------------------------------------------------------------
+
+model AuditLog {
+  id         BigInt   @id @default(autoincrement())
+  userId     String?  @map("user_id") @db.Uuid
+  action     String   @db.VarChar(100)
+  entityType String   @map("entity_type") @db.VarChar(100)
+  entityId   String?  @map("entity_id") @db.Uuid
+  oldData    Json?    @map("old_data") @db.JsonB
+  newData    Json?    @map("new_data") @db.JsonB
+  userAgent  String?  @map("user_agent") @db.Text
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([entityType, entityId])
+  @@map("audit_logs")
+}

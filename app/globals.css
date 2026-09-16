@@ -1,26 +1,116 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Base surfaces */
+  --background: #fbf7f0;
+  --foreground: #201a14;
+
+  /* Brand palette */
+  --cream: #fbf7f0;
+  --cream-100: #f4ecdf;
+  --sand: #efe4d3;
+  --clay: #c2410c;
+  --clay-dark: #9a3412;
+  --terracotta: #d1542a;
+  --saffron: #e0922f;
+  --gold: #c8992f;
+  --forest: #123227;
+  --forest-800: #1a4536;
+  --espresso: #201a14;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
+  --color-cream: #fbf7f0;
+  --color-cream-100: #f4ecdf;
+  --color-sand: #efe4d3;
+
+  --color-clay: #c2410c;
+  --color-clay-dark: #9a3412;
+  --color-terracotta: #d1542a;
+  --color-saffron: #e0922f;
+  --color-gold: #c8992f;
+
+  --color-forest: #123227;
+  --color-forest-800: #1a4536;
+  --color-forest-700: #235844;
+  --color-espresso: #201a14;
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-display: var(--font-display);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  border-color: color-mix(in oklab, var(--foreground) 10%, transparent);
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: color-mix(in oklab, var(--clay) 24%, transparent);
+  color: var(--espresso);
+}
+
+/* Thin, subtle scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: color-mix(in oklab, var(--clay) 45%, transparent);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-track {
+  background: var(--cream-100);
+}
+
+@keyframes floaty {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-floaty {
+  animation: floaty 6s ease-in-out infinite;
+}
+
+.animate-fade-up {
+  animation: fade-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* Decorative Central-Asian inspired dotted pattern */
+.pattern-dots {
+  background-image: radial-gradient(
+    color-mix(in oklab, var(--gold) 55%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 22px 22px;
 }

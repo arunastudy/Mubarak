@@ -9,23 +9,27 @@ import { Branches } from "./components/Branches";
 import { AppPromo } from "./components/AppPromo";
 import { CtaSection } from "./components/CtaSection";
 import { Footer } from "./components/Footer";
+import { getDictionary, getLocale } from "./i18n/dictionaries";
 
-export default function Home() {
+export default async function Home() {
+  const locale = await getLocale();
+  const dict = await getDictionary(locale);
+
   return (
     <div className="flex min-h-screen flex-col bg-cream">
-      <Navbar />
+      <Navbar dict={dict.nav} locale={locale} />
       <main className="flex-1">
-        <Hero />
-        <Features />
-        <MenuShowcase />
-        <OrderTypes />
-        <Booking />
-        <Loyalty />
-        <Branches />
-        <AppPromo />
-        <CtaSection />
+        <Hero dict={dict.hero} />
+        <Features dict={dict.features} />
+        <MenuShowcase dict={dict.menu} />
+        <OrderTypes dict={dict.orderTypes} />
+        <Booking dict={dict.booking} />
+        <Loyalty dict={dict.loyalty} />
+        <Branches dict={dict.branches} />
+        <AppPromo dict={dict.appPromo} />
+        <CtaSection dict={dict.cta} />
       </main>
-      <Footer />
+      <Footer dict={dict.footer} />
     </div>
   );
 }

@@ -1,27 +1,40 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { Logo } from "./Logo";
 import { IconMenu, IconClose, IconArrowRight, IconGlobe } from "./icons";
+import { locales, localeLabels, type Locale } from "../i18n/config";
+import { setLocale } from "../i18n/actions";
+import type { Dictionary } from "../i18n/dictionaries";
 
-const links = [
-  { href: "#menu", label: "Меню" },
-  { href: "#delivery", label: "Доставка" },
-  { href: "#booking", label: "Бронирование" },
-  { href: "#loyalty", label: "Лояльность" },
-  { href: "#branches", label: "Филиалы" },
-];
+const linkHrefs = ["#menu", "#delivery", "#booking", "#loyalty", "#branches"];
 
-const languages = ["RU", "KY", "EN"] as const;
-
-export function Navbar() {
+export function Navbar({
+  dict,
+  locale,
+}: {
+  dict: Dictionary["nav"];
+  locale: Locale;
+}) {
   const [open, setOpen] = useState(false);
-  const [lang, setLang] = useState<(typeof languages)[number]>("RU");
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
+
+  const links = linkHrefs.map((href, i) => ({ href, label: dict.links[i] }));
+
+  function changeLanguage(code: Locale) {
+    if (code === locale) return;
+    startTransition(async () => {
+      await setLocale(code);
+      router.refresh();
+    });
+  }
 
   return (
     <header className="sticky top-0 z-50 border-b border-espresso/8 bg-cream/80 backdrop-blur-xl">
       <nav className="mx-auto flex h-18 max-w-7xl items-center justify-between gap-6 px-5 py-3.5 sm:px-8">
-        <a href="#top" className="shrink-0" aria-label="Mubarak — на главную">
+        <a href="#top" className="shrink-0" aria-label={dict.homeAria}>
           <Logo />
         </a>
 
@@ -39,20 +52,26 @@ export function Navbar() {
         </ul>
 
         <div className="flex items-center gap-2.5">
-          <div className="hidden items-center rounded-full border border-espresso/10 bg-white/60 p-0.5 sm:flex">
+          <div
+            className="hidden items-center rounded-full border border-espresso/10 bg-white/60 p-0.5 sm:flex"
+            role="group"
+            aria-label={dict.languageAria}
+          >
             <IconGlobe className="ml-2 mr-1 h-4 w-4 text-espresso/40" />
-            {languages.map((code) => (
+            {locales.map((code) => (
               <button
                 key={code}
                 type="button"
-                onClick={() => setLang(code)}
-                className={`rounded-full px-2.5 py-1 text-xs font-semibold transition-colors ${
-                  lang === code
+                onClick={() => changeLanguage(code)}
+                disabled={isPending}
+                aria-pressed={locale === code}
+                className={`rounded-full px-2.5 py-1 text-xs font-semibold transition-colors disabled:opacity-60 ${
+                  locale === code
                     ? "bg-forest text-cream"
                     : "text-espresso/50 hover:text-espresso"
                 }`}
               >
-                {code}
+                {localeLabels[code]}
               </button>
             ))}
           </div>
@@ -61,7 +80,7 @@ export function Navbar() {
             href="#menu"
             className="group hidden items-center gap-2 rounded-full bg-clay px-5 py-2.5 text-sm font-semibold text-cream shadow-sm shadow-clay/20 transition-all hover:bg-clay-dark hover:shadow-md sm:inline-flex"
           >
-            Заказать
+            {dict.order}
             <IconArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </a>
 
@@ -69,7 +88,7 @@ export function Navbar() {
             type="button"
             onClick={() => setOpen((v) => !v)}
             className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-espresso/10 text-espresso lg:hidden"
-            aria-label="Открыть меню"
+            aria-label={dict.menuAria}
             aria-expanded={open}
           >
             {open ? (
@@ -95,13 +114,32 @@ export function Navbar() {
                 </a>
               </li>
             ))}
+            <li className="mt-2 flex items-center gap-1.5 px-1 py-2">
+              <IconGlobe className="mr-1 h-4 w-4 text-espresso/40" />
+              {locales.map((code) => (
+                <button
+                  key={code}
+                  type="button"
+                  onClick={() => changeLanguage(code)}
+                  disabled={isPending}
+                  aria-pressed={locale === code}
+                  className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors disabled:opacity-60 ${
+                    locale === code
+                      ? "bg-forest text-cream"
+                      : "bg-espresso/5 text-espresso/60"
+                  }`}
+                >
+                  {localeLabels[code]}
+                </button>
+              ))}
+            </li>
             <li className="mt-2">
               <a
                 href="#menu"
                 onClick={() => setOpen(false)}
                 className="flex items-center justify-center gap-2 rounded-xl bg-clay px-5 py-3 text-base font-semibold text-cream"
               >
-                Заказать сейчас
+                {dict.orderNow}
                 <IconArrowRight className="h-4 w-4" />
               </a>
             </li>

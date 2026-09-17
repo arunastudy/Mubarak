@@ -1,0 +1,253 @@
+{
+  "navbar": {
+    "links": {
+      "menu": "Menu",
+      "delivery": "Delivery",
+      "booking": "Reservation",
+      "loyalty": "Loyalty",
+      "branches": "Locations"
+    },
+    "order": "Order",
+    "orderNow": "Order now",
+    "aria": {
+      "home": "Mubarak — go to home",
+      "toggleMenu": "Open menu"
+    }
+  },
+  "hero": {
+    "badge": "Oriental and Kyrgyz cuisine",
+    "titleBefore": "The taste of",
+    "titleBrand": "Mubarak",
+    "titleAfter": "chaikhana, now in one app",
+    "subtitle": "Online menu, fast delivery, table reservations and QR ordering right at your table. One digital platform for the whole network of 9+ locations.",
+    "orderFood": "Order food",
+    "bookTable": "Book a table",
+    "rating": {
+      "score": "4.9",
+      "reviews": "12,000+ reviews"
+    },
+    "branches": "9+ locations",
+    "delivery": "Delivery from 30 min",
+    "since": "since 1998",
+    "orderCard": {
+      "order": "Order #4821",
+      "status": "On the way · 12 min"
+    },
+    "ratingCard": {
+      "title": "Happy guests",
+      "subtitle": "98% recommend"
+    }
+  },
+  "features": {
+    "eyebrow": "Features",
+    "title": "Everything for a comfortable order",
+    "subtitle": "One platform brings together menu, delivery, reservations and loyalty — on the web, in the mobile app and on Telegram.",
+    "items": {
+      "menu": {
+        "title": "Smart online menu",
+        "text": "Photo, ingredients, calories, macros, allergens, weight and cooking time — for every dish."
+      },
+      "delivery": {
+        "title": "Fast delivery",
+        "text": "Automatic order distribution, courier GPS and precise arrival time on the map."
+      },
+      "booking": {
+        "title": "Table reservations",
+        "text": "Choose a location, a zone — hall, terrace or VIP, the date, the time and pre-order dishes."
+      },
+      "qr": {
+        "title": "QR ordering at the table",
+        "text": "Scan the QR on your table — open the menu, order and pay the bill without waiting."
+      },
+      "loyalty": {
+        "title": "Loyalty program",
+        "text": "Cashback, bonuses and birthday gifts across Bronze, Silver, Gold and Platinum tiers."
+      },
+      "notifications": {
+        "title": "Notifications",
+        "text": "Order and reservation status in real time — push, SMS and Telegram."
+      }
+    }
+  },
+  "menu": {
+    "eyebrow": "Menu",
+    "title": "More than 200 oriental dishes",
+    "subtitle": "Breakfasts, soups, pilaf, manti, kebabs, Kyrgyz cuisine, desserts and drinks — all made from fresh ingredients every day.",
+    "openAll": "Open full menu",
+    "categories": {
+      "pilaf": { "name": "Pilaf", "count": "8 kinds" },
+      "manti": { "name": "Manti", "count": "6 kinds" },
+      "kebab": { "name": "Kebabs", "count": "12 kinds" },
+      "soups": { "name": "Soups", "count": "9 kinds" },
+      "salads": { "name": "Salads", "count": "14 kinds" },
+      "desserts": { "name": "Desserts", "count": "10 kinds" }
+    },
+    "dishes": {
+      "pilaf": {
+        "name": "Fergana-style pilaf",
+        "desc": "Devzira rice, lamb, carrot, cumin",
+        "price": "390",
+        "weight": "350 g",
+        "badge": "Hit"
+      },
+      "manti": {
+        "name": "Manti with lamb",
+        "desc": "Hand-made, juicy filling, onion",
+        "price": "280",
+        "weight": "5 pcs · 300 g",
+        "badge": "Popular"
+      },
+      "kebab": {
+        "name": "Lamb kebab",
+        "desc": "Oriental marinade, lavash, sauce",
+        "price": "340",
+        "weight": "250 g",
+        "badge": "Spicy"
+      }
+    },
+    "currency": "som"
+  },
+  "orderTypes": {
+    "eyebrow": "How to order",
+    "title": "Three convenient ways",
+    "subtitle": "Choose a format, pay however you like and get your favorite dishes with no extra steps.",
+    "featuredBadge": "Popular",
+    "types": {
+      "delivery": {
+        "title": "Delivery",
+        "text": "We'll bring your hot order across the city with courier tracking on the map.",
+        "points": ["Delivery from 30 minutes", "Courier GPS and ETA", "Contactless"]
+      },
+      "pickup": {
+        "title": "Pickup",
+        "text": "We'll have your order ready for your arrival — no queue, no waiting.",
+        "points": ["Ready on time", "Pickup discount", "Online payment"]
+      },
+      "dineIn": {
+        "title": "Order at the table",
+        "text": "Order at your table via QR code and pay the bill from your smartphone.",
+        "points": ["QR menu on the table", "Call a waiter", "Pay by QR"]
+      }
+    },
+    "payment": {
+      "title": "Pay however you like",
+      "subtitle": "Online, by card, in cash or by QR at the restaurant",
+      "methods": ["QR payment", "MBank", "Elkart", "Visa / Mastercard", "Cash"]
+    }
+  },
+  "booking": {
+    "eyebrow": "Reservation",
+    "title": "Book a table in a minute",
+    "subtitle": "Pick a location, a zone and a time, set the number of guests and pre-order dishes if you like. Confirmation arrives via SMS and Telegram.",
+    "zones": {
+      "hall": { "name": "Hall", "desc": "Cozy main area", "seats": "up to 6 guests" },
+      "terrace": { "name": "Terrace", "desc": "Fresh air and a view", "seats": "up to 8 guests" },
+      "vip": { "name": "VIP", "desc": "Private room", "seats": "up to 12 guests" }
+    },
+    "cta": "Book now",
+    "card": {
+      "title": "New reservation",
+      "status": "Confirmed",
+      "rows": {
+        "branch": { "label": "Location", "value": "Mubarak · Center" },
+        "date": { "label": "Date", "value": "Sat, September 20" },
+        "time": { "label": "Time", "value": "19:30 — 21:30" },
+        "guests": { "label": "Guests", "value": "4 guests · Terrace" }
+      },
+      "preorder": { "label": "Pre-order", "value": "Pilaf, manti, tea" },
+      "deposit": { "label": "Deposit", "value": "1,000 som" },
+      "confirmation": "Confirmation sent to Telegram"
+    }
+  },
+  "loyalty": {
+    "badge": "Loyalty program",
+    "title": "The more often you visit — the more you save",
+    "subtitle": "Earn cashback and bonuses, get discounts and birthday gifts, and invite friends through the referral program.",
+    "cashbackLabel": "cashback on every order",
+    "tiers": {
+      "bronze": { "name": "Bronze", "cashback": "3%", "perks": "Program start" },
+      "silver": { "name": "Silver", "cashback": "5%", "perks": "Personal discounts" },
+      "gold": { "name": "Gold", "cashback": "8%", "perks": "Birthday gift" },
+      "platinum": { "name": "Platinum", "cashback": "12%", "perks": "Exclusive events" }
+    },
+    "referral": {
+      "highlight": "Bring a friend",
+      "text": "— and you'll both get bonuses on your first order."
+    }
+  },
+  "branches": {
+    "eyebrow": "Locations",
+    "title": "9+ locations near you",
+    "subtitle": "The Mubarak chaikhana network is growing across Kyrgyzstan. Find the nearest location on the map — with address, opening hours and directions.",
+    "viewMap": "View on map",
+    "items": {
+      "center": { "name": "Mubarak · Center", "address": "128 Chuy Ave.", "hours": "09:00 — 00:00", "city": "Bishkek" },
+      "south": { "name": "Mubarak · South", "address": "97 Akhunbaev St.", "hours": "10:00 — 23:00", "city": "Bishkek" },
+      "vostok5": { "name": "Mubarak · Vostok-5", "address": "Vostok-5 district, 12", "hours": "09:00 — 23:00", "city": "Bishkek" },
+      "djal": { "name": "Mubarak · Djal", "address": "Djal district, 23", "hours": "10:00 — 00:00", "city": "Bishkek" },
+      "osh": { "name": "Mubarak · Osh", "address": "40 Kurmanjan Datka St.", "hours": "09:00 — 23:00", "city": "Osh" },
+      "karaBalta": { "name": "Mubarak · Kara-Balta", "address": "5 Kozhomberdiev St.", "hours": "10:00 — 22:00", "city": "Kara-Balta" }
+    }
+  },
+  "appPromo": {
+    "badge": "App · PWA",
+    "title": "Mubarak always at hand",
+    "subtitle": "Install the app without the App Store, straight from your browser. Order, book and collect bonuses from your smartphone — and receive orders via the Telegram bot.",
+    "perks": [
+      "Push notifications about order status",
+      "QR ordering and payment right at the table",
+      "Offline menu and quick access"
+    ],
+    "installApp": "Install the app",
+    "openTelegram": "Open in Telegram",
+    "phone": {
+      "brand": "Mubarak",
+      "mode": "Delivery · Center",
+      "order": "Order #4821",
+      "status": "On the way",
+      "eta": "Arrives in",
+      "etaValue": "12 min",
+      "items": ["Fergana-style pilaf", "Manti with lamb", "Tea with thyme"],
+      "total": "Total · 1,060 som"
+    }
+  },
+  "cta": {
+    "title": "Ready to taste Mubarak?",
+    "subtitle": "Place your first order online and get bonuses on your loyalty account. We'll deliver it hot in 30 minutes.",
+    "orderNow": "Order now",
+    "phone": "+996 700 000 000"
+  },
+  "footer": {
+    "description": "The Mubarak digital chaikhana network — oriental and Kyrgyz cuisine, delivery, reservations and a loyalty program in one place.",
+    "contacts": {
+      "address": "Bishkek, 128 Chuy Ave.",
+      "phone": "+996 700 000 000",
+      "hours": "Daily · 09:00 — 00:00"
+    },
+    "columns": {
+      "menu": {
+        "title": "Menu",
+        "links": ["Pilaf", "Manti", "Kebabs", "Soups", "Desserts", "Drinks"]
+      },
+      "service": {
+        "title": "Service",
+        "links": ["Delivery", "Pickup", "Reservation", "QR ordering", "Loyalty"]
+      },
+      "company": {
+        "title": "Company",
+        "links": ["About us", "Locations", "Promotions", "Careers", "Contacts", "FAQ"]
+      }
+    },
+    "copyright": "© {year} Mubarak Chaikhana. All rights reserved.",
+    "aria": {
+      "telegram": "Telegram",
+      "site": "Website"
+    }
+  },
+  "metadata": {
+    "title": "Mubarak — the #1 chaikhana network in Kyrgyzstan",
+    "description": "Mubarak is a digital chaikhana network: online menu, delivery, table reservations, QR ordering and a loyalty program. Oriental and Kyrgyz cuisine across 9+ locations.",
+    "ogTitle": "Mubarak — the #1 chaikhana network in Kyrgyzstan",
+    "ogDescription": "Online menu, delivery, reservations and the loyalty program of the Mubarak chaikhana network."
+  }
+}

@@ -10,14 +10,20 @@ import { AppPromo } from "./components/AppPromo";
 import { CtaSection } from "./components/CtaSection";
 import { Footer } from "./components/Footer";
 import { getDictionary, getLocale } from "./i18n/dictionaries";
+import { getCurrentUser, userDisplayName } from "@/lib/auth";
 
 export default async function Home() {
   const locale = await getLocale();
   const dict = await getDictionary(locale);
+  const user = await getCurrentUser();
 
   return (
     <div className="flex min-h-screen flex-col bg-cream">
-      <Navbar dict={dict.nav} locale={locale} />
+      <Navbar
+        dict={dict.nav}
+        locale={locale}
+        user={user ? { name: userDisplayName(user) } : null}
+      />
       <main className="flex-1">
         <Hero dict={dict.hero} />
         <Features dict={dict.features} />

@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "tg:chat-id": "tsx scripts/telegram-chat-id.ts",
+    "tg:test": "tsx scripts/telegram-test.ts",
+    "tg:reset-webhook": "tsx scripts/telegram-reset-webhook.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.0",

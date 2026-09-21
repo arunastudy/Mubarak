@@ -1,9 +1,11 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { logoutAction } from "../auth/actions";
 import { Logo } from "./Logo";
-import { IconMenu, IconClose, IconArrowRight, IconGlobe } from "./icons";
+import { IconMenu, IconClose, IconArrowRight, IconGlobe, IconUser } from "./icons";
 import { locales, localeLabels, type Locale } from "../i18n/config";
 import { setLocale } from "../i18n/actions";
 import type { Dictionary } from "../i18n/dictionaries";
@@ -13,9 +15,12 @@ const linkHrefs = ["#menu", "#delivery", "#booking", "#loyalty", "#branches"];
 export function Navbar({
   dict,
   locale,
+  user,
 }: {
   dict: Dictionary["nav"];
   locale: Locale;
+  /** null — гость не вошёл; тогда показываем кнопку «Войти». */
+  user: { name: string } | null;
 }) {
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -75,6 +80,25 @@ export function Navbar({
               </button>
             ))}
           </div>
+
+          {user ? (
+            <Link
+              href="/auth"
+              aria-label={dict.account}
+              className="hidden max-w-40 items-center gap-2 rounded-full border border-espresso/10 bg-white/70 px-4 py-2.5 text-sm font-semibold text-espresso transition-colors hover:bg-white md:inline-flex"
+            >
+              <IconUser className="h-4 w-4 shrink-0 text-forest" />
+              <span className="truncate">{user.name}</span>
+            </Link>
+          ) : (
+            <Link
+              href="/auth"
+              className="hidden items-center gap-2 rounded-full border border-espresso/10 bg-white/70 px-4 py-2.5 text-sm font-semibold text-espresso transition-colors hover:bg-white md:inline-flex"
+            >
+              <IconUser className="h-4 w-4 text-espresso/45" />
+              {dict.login}
+            </Link>
+          )}
 
           <a
             href="#menu"
@@ -142,6 +166,39 @@ export function Navbar({
                 {dict.orderNow}
                 <IconArrowRight className="h-4 w-4" />
               </a>
+            </li>
+
+            <li className="mt-2 border-t border-espresso/8 pt-3">
+              {user ? (
+                <div className="flex items-center gap-2">
+                  <Link
+                    href="/auth"
+                    onClick={() => setOpen(false)}
+                    aria-label={dict.account}
+                    className="flex min-w-0 flex-1 items-center gap-2 rounded-xl border border-espresso/12 px-4 py-3 text-base font-semibold text-espresso"
+                  >
+                    <IconUser className="h-5 w-5 shrink-0 text-forest" />
+                    <span className="truncate">{user.name}</span>
+                  </Link>
+                  <form action={logoutAction}>
+                    <button
+                      type="submit"
+                      className="rounded-xl border border-espresso/12 px-4 py-3 text-base font-semibold text-espresso/65"
+                    >
+                      {dict.logout}
+                    </button>
+                  </form>
+                </div>
+              ) : (
+                <Link
+                  href="/auth"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center justify-center gap-2 rounded-xl border border-espresso/12 px-5 py-3 text-base font-semibold text-espresso"
+                >
+                  <IconUser className="h-5 w-5 text-espresso/45" />
+                  {dict.login}
+                </Link>
+              )}
             </li>
           </ul>
         </div>

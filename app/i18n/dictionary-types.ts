@@ -9,6 +9,45 @@ export type Dictionary = {
     links: string[]; // matches nav hrefs by index
     order: string;
     orderNow: string;
+    login: string;
+    account: string;
+    logout: string;
+  };
+  // Sign-in / sign-up page at /auth
+  auth: {
+    badge: string;
+    backHome: string;
+    tabs: { login: string; register: string };
+    login: { title: string; subtitle: string; submit: string };
+    register: { title: string; subtitle: string; submit: string };
+    fields: {
+      name: string;
+      namePlaceholder: string;
+      email: string;
+      emailPlaceholder: string;
+      password: string;
+      passwordPlaceholder: string;
+      passwordHint: string; // use {min} placeholder
+    };
+    pending: string;
+    or: string;
+    google: string;
+    googleUnavailable: string;
+    legal: string;
+    session: { title: string; home: string; logout: string };
+    errors: {
+      fields: string;
+      email: string;
+      password: string; // use {min} placeholder
+      credentials: string;
+      emailTaken: string;
+      blocked: string;
+      googleCancelled: string;
+      googleFailed: string;
+      googleExpired: string;
+      googleUnavailable: string;
+      unknown: string;
+    };
   };
   hero: {
     badge: string;

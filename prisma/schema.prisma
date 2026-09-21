@@ -111,9 +111,13 @@ enum NotificationStatus {
 
 model User {
   id                String     @id @default(uuid()) @db.Uuid
-  phone             String     @unique @db.VarChar(20)
+  /// Необязателен: при регистрации через Google телефона у нас нет.
+  phone             String?    @unique @db.VarChar(20)
   email             String?    @unique @db.VarChar(255)
-  passwordHash      String     @map("password_hash") @db.VarChar(255)
+  /// Необязателен: у аккаунтов, созданных через Google, пароля нет.
+  passwordHash      String?    @map("password_hash") @db.VarChar(255)
+  /// `sub` из Google ID-токена. Связывает аккаунт с Google-профилем.
+  googleId          String?    @unique @map("google_id") @db.VarChar(255)
   firstName         String?    @map("first_name") @db.VarChar(100)
   lastName          String?    @map("last_name") @db.VarChar(100)
   avatarUrl         String?    @map("avatar_url") @db.Text
@@ -407,11 +411,11 @@ model Order {
   updatedAt      DateTime    @updatedAt @map("updated_at") @db.Timestamptz(6)
   completedAt    DateTime?   @map("completed_at") @db.Timestamptz(6)
 
-  user    User             @relation(fields: [userId], references: [id])
-  branch  Branch           @relation(fields: [branchId], references: [id])
-  table   RestaurantTable? @relation(fields: [tableId], references: [id], onDelete: SetNull)
-  address DeliveryAddress? @relation(fields: [addressId], references: [id], onDelete: SetNull)
-  items   OrderItem[]
+  user     User             @relation(fields: [userId], references: [id])
+  branch   Branch           @relation(fields: [branchId], references: [id])
+  table    RestaurantTable? @relation(fields: [tableId], references: [id], onDelete: SetNull)
+  address  DeliveryAddress? @relation(fields: [addressId], references: [id], onDelete: SetNull)
+  items    OrderItem[]
   payments Payment[]
 
   @@index([userId])
@@ -529,17 +533,17 @@ model ReservationItem {
 // ---------------------------------------------------------------------------
 
 model CustomerProfile {
-  id                String    @id @default(uuid()) @db.Uuid
-  userId            String    @unique @map("user_id") @db.Uuid
-  birthday          DateTime? @db.Date
-  totalOrders       Int       @default(0) @map("total_orders")
-  totalSpent        Decimal   @default(0) @map("total_spent") @db.Decimal(14, 2)
-  averageCheck      Decimal   @default(0) @map("average_check") @db.Decimal(12, 2)
-  firstOrderAt      DateTime? @map("first_order_at") @db.Timestamptz(6)
-  lastOrderAt       DateTime? @map("last_order_at") @db.Timestamptz(6)
-  marketingConsent  Boolean   @default(false) @map("marketing_consent")
-  createdAt         DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt         DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
+  id               String    @id @default(uuid()) @db.Uuid
+  userId           String    @unique @map("user_id") @db.Uuid
+  birthday         DateTime? @db.Date
+  totalOrders      Int       @default(0) @map("total_orders")
+  totalSpent       Decimal   @default(0) @map("total_spent") @db.Decimal(14, 2)
+  averageCheck     Decimal   @default(0) @map("average_check") @db.Decimal(12, 2)
+  firstOrderAt     DateTime? @map("first_order_at") @db.Timestamptz(6)
+  lastOrderAt      DateTime? @map("last_order_at") @db.Timestamptz(6)
+  marketingConsent Boolean   @default(false) @map("marketing_consent")
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime  @updatedAt @map("updated_at") @db.Timestamptz(6)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 

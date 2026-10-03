@@ -12,6 +12,7 @@
     "tg:reset-webhook": "tsx scripts/telegram-reset-webhook.ts"
   },
   "dependencies": {
+    "@mancho.devs/authorizer": "^2.12.8",
     "@prisma/adapter-pg": "^7.10.0",
     "@prisma/client": "^7.10.0",
     "next": "16.3.5",

@@ -1,5 +1,5 @@
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient } from "@/generated/prisma/client";
+import { PrismaClient } from "@/generated/prisma";
 
 // Reuse a single PrismaClient across hot-reloads in development to avoid
 // exhausting database connections (Next.js recreates modules on each reload).

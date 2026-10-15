@@ -3,7 +3,7 @@
 // Database: PostgreSQL (uses UUID, JSONB, BIGSERIAL, TIMESTAMPTZ)
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../generated/prisma"
 }
 
